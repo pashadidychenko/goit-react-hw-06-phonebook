@@ -1,12 +1,15 @@
 import React from "react";
-import PropTypes from "prop-types";
 import { v4 as uuidv4 } from "uuid";
 import styles from "./AddContact.module.css";
+import Alert from "../../Alet/Alert";
+import { CSSTransition } from "react-transition-group";
+import alertTransition from "../../Contacts/transitions/alert.module.css";
 
 export class AddContact extends React.Component {
   state = {
     name: "",
     number: "",
+    exist: false,
   };
 
   handleInputValue = (el) => {
@@ -20,9 +23,21 @@ export class AddContact extends React.Component {
     el.preventDefault();
     const contact = {
       id: uuidv4(),
-      ...this.state,
+      name: this.state.name.replace(/\b\w/g, (l) => l.toUpperCase()),
+      number: this.state.number,
     };
-    this.props.onFormSubmit(contact);
+    if (
+      this.props.items.find(
+        (element) => element.name.toLowerCase() === contact.name.toLowerCase()
+      )
+    ) {
+      this.setState({ exist: true });
+      return setTimeout(() => {
+        this.setState({ exist: false });
+      }, 2000);
+    } else {
+      this.props.addNewItem(contact);
+    }
     this.setState({
       name: "",
       number: "",
@@ -30,9 +45,9 @@ export class AddContact extends React.Component {
   };
 
   render() {
-    const { name, number } = this.state;
+    const { name, number, exist } = this.state;
     return (
-      <form className={styles.contactForm}>
+      <form className={styles.contactForm} onSubmit={this.handleSubmit}>
         <label htmlFor="contactName">Ім'я</label>
         <input
           id="contactName"
@@ -53,15 +68,18 @@ export class AddContact extends React.Component {
           onChange={this.handleInputValue}
         />
         <br />
-        <button variant="outlined" type="submit" onClick={this.handleSubmit}>
+        <button variant="outlined" type="submit">
           Додати контакт
         </button>
+        <CSSTransition
+          in={exist}
+          timeout={250}
+          classNames={alertTransition}
+          unmountOnExit
+        >
+          <Alert />
+        </CSSTransition>
       </form>
     );
   }
 }
-
-AddContact.propTypes = {
-  name: PropTypes.string,
-  number: PropTypes.string,
-};

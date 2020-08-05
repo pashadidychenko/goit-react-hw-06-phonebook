@@ -1,21 +1,31 @@
 import React from "react";
 import ContactListItem from "../ContactListItem/ContactListItem";
-import PropTypes from "prop-types";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
 import styles from "./ContactList.module.css";
 import slideTransition from "../transitions/slide.module.css";
 
-const ContactList = ({ contactList, deleteContact }) => {
+function filteredContact(items, filter) {
+  if (filter.length !== 0) {
+    return items.filter((contact) =>
+      contact.name.toLowerCase().includes(filter.toLowerCase())
+    );
+  } else {
+    return items;
+  }
+}
+
+const ContactList = ({ items = [], filter = "", deleteItem }) => {
+  const contacts = filteredContact(items, filter);
   return (
     <TransitionGroup component="ul" className={styles.contactList}>
-      {contactList.map((contact) => (
+      {contacts.map((contact) => (
         <CSSTransition
           key={contact.id}
           timeout={250}
           classNames={slideTransition}
         >
           <ContactListItem
-            deleteContact={() => deleteContact(contact.id)}
+            deleteItem={deleteItem}
             contact={contact}
             key={contact.id}
           />
@@ -26,7 +36,3 @@ const ContactList = ({ contactList, deleteContact }) => {
 };
 
 export default ContactList;
-
-ContactList.propTypes = {
-  contactList: PropTypes.array,
-};
