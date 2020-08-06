@@ -62,10 +62,17 @@ class Phonebook extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    items: state.items,
-    filter: state.filter,
+    items: state.contacts.items,
+    filter: state.contacts.filter,
   };
 };
+
+// const mapStateToProps = (state) => {
+//   return {
+//     items: state.items,
+//     filter: state.filter,
+//   };
+// };
 
 const mapDispatchToProps = {
   addNewItem,
